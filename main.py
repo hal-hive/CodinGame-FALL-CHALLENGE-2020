@@ -9,7 +9,6 @@ answer = 0
 
 
 def print_h():
-    answer_id = 0
     BREW = 'BREW '
     REST = 'REST'
     CAST = 'CAST '
@@ -30,7 +29,7 @@ def print_h():
     spells[2, :] = [82, 0, -1, 1, 0, 1]
     spells[3, :] = [83, 0, 0, -1, 1, 1]
 
-    ingredients[0, :] = [0, 3, 1, 0, 0]
+    ingredients[0, :] = [0, 3, 0, 0, 0]
     ingredients[1, :] = [0, 3, 0, 0, 0]
 
     coefficient = np.zeros(shape=(7, 4))
@@ -76,16 +75,7 @@ def print_h():
                 m.clear()
 
     x = np.nonzero(recipes[:, 10])
-    if np.count_nonzero(x) == 1:
-        answer_id = np.take(recipes[:, 0], x)
-        answer = BREW + str(int(answer_id))
-    elif np.count_nonzero(x) > 1:
-        ind_price = np.take(recipes[:, 5], x)
-        pric = ind_price.max()
-        ans = recipes[recipes[:, 5] == pric]
-        answer_id = ans[0, 0]
-        answer = BREW + str(int(answer_id))
-    else:
+    if np.count_nonzero(x) == 0:
         ro = 0
         for i in recipes[:, 6:10]:
             co = 0
@@ -160,7 +150,12 @@ def print_h():
                 else:
                     answer = check_n(0)
                     break
-
+    else:
+        ind_price = np.take(recipes[:, 5], x)
+        pric = ind_price.max()
+        ans = recipes[recipes[:, 5] == pric]
+        answer_id = ans[0, 0]
+        answer = BREW + str(int(answer_id))
     print(answer)
 
 
@@ -170,3 +165,6 @@ if __name__ == '__main__':
     print_h()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
+#    if np.count_nonzero(x) == 1:
+#        answer_id = np.take(recipes[:, 0], x)
+#        answer = BREW + str(int(answer_id))
