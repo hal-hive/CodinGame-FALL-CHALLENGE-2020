@@ -322,10 +322,10 @@ def print_h():
             r = r + 1
 
         # ### 4.2 записую в словник результати всіх своїх додаткових заклинань
-        r = 4
+        r = 0
         for i in spells[4:, 1:5]:
-            sum = np.sum(i)
-            if sum != 0:
+            idi = spells[r, 0]
+            if idi != 0:
                 q = chek_can_do(i, ingredients)
                 z = check_owerflow(i, ingredients)
                 if q == True and z == True and spells[r, 5] == 1:
