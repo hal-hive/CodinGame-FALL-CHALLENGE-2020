@@ -4,6 +4,7 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import numpy as np
 
+
 answer = 0
 
 def print_h():
@@ -26,12 +27,14 @@ def print_h():
     recipes[4, 0:6] = [74, 0, 0, 0, -4, 16]
     recipes[:, 17] = [0, 1, 2, 3, 4]
 
-    spells[0, :] = [80, 2, 0, 0, 0, 1]
-    spells[1, :] = [81, -1, 1, 0, 0, 1]
-    spells[2, :] = [82, 0, -1, 1, 0, 1]
-    spells[3, :] = [83, 0, 0, -1, 1, 1]
+    spells[0, :] = [78, 2, 0, 0, 0, 1]
+    spells[1, :] = [79, -1, 1, 0, 0, 1]
+    spells[2, :] = [80, 0, -1, 1, 0, 1]
+    spells[3, :] = [81, 0, 0, -1, 1, 1]
+    spells[4, :] = [90, 0, 2, 0, 0, 0]
+    spells[5, :] = [91, -2, 0, -1, 2, 1]
 
-    ingredients[0, :] = [0, 3, 0, 0, 0]
+    ingredients[0, :] = [0, 3, 1, 0, 0]
     ingredients[1, :] = [0, 3, 0, 0, 0]
 
     coefficient[1, :] = [2, 3, 4, 5]
@@ -83,11 +86,136 @@ def print_h():
 
     # 2. розгалуження, шлях 2 - можу зробити замовлення, шлях 3 - неможу зробити замовлення / рахую дальше
 
-    # 3. шлях 3-неможу зробити замовлення
+    # 3. шлях 3-неможу зробити замовлення, створюю словник для можливих варіантів
+    dict_id = {}
+
     # 3. шлях 3 / рахую дальше
     if y == 0:
 
         # ### m. виконання додаткових заклинань, якщо вони є
+        # ### перевірка заклинання на можливість виконати (є достатньо інгредієнтів)
+        def chek_can_do(index, ingredients):
+            ingr = ingredients[0, 1:5] + index
+            q = 0
+            for j in ingr:
+                if j < 0:
+                    return False
+                else:
+                    q = q + 1
+            return True
+
+        # ### перевірка заклинання на можливість виконати (є достатньо місця для інгредієнтів)
+        def check_owerflow(index, ingredients):
+            ingr_main = np.sum(ingredients[0, 1:5])
+            ingr_two = np.sum(index)
+            result = ingr_main + ingr_two
+            if result <= 10:
+                return True
+            else:
+                return False
+
+        # ### повертає максимальну питому вартість для конкретного заклинання
+        def best_unit_price(index, count, recipes, ingredients, coefficient):
+
+            # ### створюю пустий масив для розрунків
+            array = np.zeros(shape=(5, 11))
+
+            # ### 5.2 віднімаю від своїх нових інгредієнтів (row 2) замовлення
+            n = 0
+            ingredients[2, 1:5] = ingredients[0, 1:5] + index
+            for i in recipes[:, 1:5]:
+                array[n, 0:4] = ingredients[2, 1:5] + i
+                n = n + 1
+
+            # ### 5.3 перевіряю чи можу виконати кожеш рецепт колонка 24 = 1-можу або 0-неможу
+            # в garbage
+
+            # ### 5.4 перевіряю колонку 24 на 1/0, індекси елементів, що не 0
+            #x = np.nonzero(array[:, 4])
+
+            # ### 5.5 у = кількість елементів в колонці 24 зі значенням 1
+            #y = np.size(x)
+
+            # ### 5.6 розгалуження. якщо можу зробити замовлення з новим інгредієнтом / або рахую дальше
+            # ### 5.7 можу зробити замовлення
+            #if y != 0:
+            #    answer_id = learns[ind_max_efficient, 0]
+            #    answer = LEARN + str(int(answer_id))
+
+            # ### 5.8 або рахую дальше
+            # ### 5.9 вираховую кількість кроків для виконання замовлень стандартними заклинаннями, колонки 25-28
+            #if y == 0:
+            ro = 0
+            for i in array[:, 0:4]:
+                co = 0
+                for j in i:
+                    if j == 0:
+                        array[ro, co + 5] = j
+                        co = co + 1
+                    elif j < 0:
+                        if abs(j) == 1:
+                            array[ro, co + 5] = coefficient[1, co]
+                            co = co + 1
+                        if abs(j) == 2:
+                            array[ro, co + 5] = coefficient[2, co]
+                            co = co + 1
+                        if abs(j) == 3:
+                            array[ro, co + 5] = coefficient[3, co]
+                            co = co + 1
+                        if abs(j) == 4:
+                            array[ro, co + 5] = coefficient[4, co]
+                            co = co + 1
+                        if abs(j) == 5:
+                            array[ro, co + 5] = coefficient[5, co]
+                            co = co + 1
+                        if abs(j) == 6:
+                            array[ro, co + 5] = coefficient[6, co]
+                            co = co + 1
+                    elif j > 0 and co == 0:
+                        j = j - (j * 2)
+                        array[ro, co + 5] = j
+                        co = co + 1
+                    else:
+                        if abs(j) == 1:
+                            array[ro, co + 5] = -1 * coefficient[1, co]
+                            co = co + 1
+                        if abs(j) == 2:
+                            array[ro, co + 5] = -1 * coefficient[2, co]
+                            co = co + 1
+                        if abs(j) == 3:
+                            array[ro, co + 5] = -1 * coefficient[3, co]
+                            co = co + 1
+                        if abs(j) == 4:
+                            array[ro, co + 5] = -1 * coefficient[4, co]
+                            co = co + 1
+                        if abs(j) == 5:
+                            array[ro, co + 5] = -1 * coefficient[5, co]
+                            co = co + 1
+                        if abs(j) == 6:
+                            array[ro, co + 5] = -1 * coefficient[6, co]
+                            co = co + 1
+                ro = ro + 1
+
+            # ### 5.11 рахую суму кроків для кожного замовлення по стандартних закриланнях, колонка 29
+            array[:, 9] = count + np.sum(array[:, 5:9], axis=1)
+
+            # ### 5.10 виправити відємні або нульові значення
+            r = 0
+            for i in array[:, 9]:
+                if i > 0:
+                    array[r, 9] = i
+                    r = r + 1
+                else:
+                    array[r, 9] = 1
+                    r = r + 1
+
+            # ### 5.12 рахую питому вартість кроку, колонка 30
+            array[:, 10] = recipes[:, 5] / array[:, 9]
+
+            # ### 5.13 вибираю максимальне значення питомої вартості, максимальне з колонки 30
+            max_averag = np.amax(array[:, 10])
+
+            return max_averag
 
         # 3.1 вираховую кількість кроків для виконання замовлень стандартними заклинаннями, колонки 11-14
         ro = 0
@@ -127,6 +255,9 @@ def print_h():
 
         # 3.4 вибираю максимальне значення питомої вартості, максимальне з колонки 16
         max_average = np.amax(recipes[:, 16])
+        ans = recipes[recipes[:, 16] == max_average]
+        brew_id = ans[0, 0]
+        dict_id['brew'] = max_average
 
         # ### 4. розрахувати ефективність додаткових заклинань, кількість кроків для кожного елемента, колонки 8-11
         learns[:, 12] = [0, -2, -2, -4, -4, -6]
@@ -180,32 +311,42 @@ def print_h():
         # ### 4.1 рахую суму кроків = ефективність, колонка 13
         learns[:, 13] = np.sum(learns[:, 8:13], axis=1)
 
-        # ### 4.2 вибираю індекс найефективнішого заклинання
-        max_efficient = np.amax(learns[:, 13])
-        ind_max_learns = learns[learns[:, 13] == max_efficient]
-        ind_max_efficient = ind_max_learns[0, 5]
-        ind_max_efficient = int(ind_max_efficient)
+        # ### 4.2 записую в словник результати всіх ефективних заклинань
+        r = 0
+        for i in learns[:, 13]:
+            if i > 0:
+                q = chek_can_do(learns[r, 1:5], ingredients)
+                z = check_owerflow(learns[r, 1:5], ingredients)
+                if q == True and z == True and ingredients[0, 1] >= learns[r, 5]:
+                    dict_id[LEARN + str(int(learns[r, 0]))] = best_unit_price(learns[r, 1:5], 2, recipes, ingredients, coefficient)
+            r = r + 1
 
-        # ### 4.3 перевіряю чи можу його виконати, додаю ефективне заклинання до своїх інгредієнтів і перевіряю на відємні значення
-        ingredients[2, 1:5] = ingredients[0, 1:5] + learns[ind_max_efficient, 1:5]
-        q = 0
-        for j in ingredients[2, 1:5]:
-            if j < 0:
-                q = -1
-                break
-            else:
-                q = 1
+        # ### 4.2 записую в словник результати всіх своїх додаткових заклинань
+        r = 4
+        for i in spells[4:, 1:5]:
+            sum = np.sum(i)
+            if sum != 0:
+                q = chek_can_do(i, ingredients)
+                z = check_owerflow(i, ingredients)
+                if q == True and z == True and spells[r, 5] == 1:
+                    dict_id[CAST + str(int(spells[r, 0]))] = best_unit_price(i, 1, recipes, ingredients, coefficient)
+            r = r + 1
+
+        # ### вибрати максимальне значення зі словника
+        v = list(dict_id.values())
+        k = list(dict_id.keys())
+        result = k[v.index(max(v))]
+        if result != 'brew':
+            answer = result
+        else:
 
         # ### розгалуження коли не можу зробити додаткове ефективне заклинання, роблю за старою схемою
-        if q == -1:
-
             # 3.5 індекс максимального питомого (рядок замовлення яке я буду виконувати)
             ind_max_step = recipes[recipes[:, 16] == max_average]
             ind_max_average = ind_max_step[0, 17]
             ind_max_average = int(ind_max_average)
 
             # n. процес виконання замовлення
-
             # n.2 перевірка стандартного заклинання на доступність (виконати заклинання чи відпочити)
             def check_n(n):
                 if spells[n, 5] == 0:
@@ -255,176 +396,6 @@ def print_h():
                         answer = check_n(0)
                         break
 
-        # ### 5. розраховую питому вартість кроку з найефективнішим додатковим заклинанням
-        elif q == 1:
-
-            # ### 5.1 повторні розрахунки, колонки 20-30 аналонічні як 6-16
-            # ### 5.2 віднімаю від своїх нових інгредієнтів (row 2) замовлення
-            n = 0
-            for i in recipes[:, 1:5]:
-                recipes[n, 20:24] = ingredients[2, 1:5] + i
-                n = n + 1
-
-            # ### 5.3 перевіряю чи можу виконати кожеш рецепт колонка 24 = 1-можу або 0-неможу
-            l: int = 0
-            while l < 5:
-                m = []
-                for i in recipes[:, 20:24]:
-                    for j in i:
-                        if j < 0:
-                            m.append(False)
-                        else:
-                            m.append(True)
-                    a = all(m)
-                    if a == False:
-                        recipes[l, 24] = 0
-                        l = l + 1
-                        m.clear()
-                    else:
-                        recipes[l, 24] = 1
-                        l = l + 1
-                        m.clear()
-
-            # ### 5.4 перевіряю колонку 24 на 1/0, індекси елементів, що не 0
-            x = np.nonzero(recipes[:, 24])
-
-            # ### 5.5 у = кількість елементів в колонці 24 зі значенням 1
-            y = np.size(x)
-
-            # ### 5.6 розгалуження. якщо можу зробити замовлення з новим інгредієнтом / або рахую дальше
-            # ### 5.7 можу зробити замовлення
-            if y != 0:
-                answer_id = learns[ind_max_efficient, 0]
-                answer = LEARN + str(int(answer_id))
-
-            # ### 5.8 або рахую дальше
-            else:
-
-                # ### 5.9 вираховую кількість кроків для виконання замовлень стандартними заклинаннями, колонки 25-28
-                if y == 0:
-                    ro = 0
-                    for i in recipes[:, 20:24]:
-                        co = 0
-                        for j in i:
-                            if j == 0:
-                                recipes[ro, co + 25] = j
-                                co = co + 1
-                            elif j < 0:
-                                if abs(j) == 1:
-                                    recipes[ro, co + 25] = coefficient[1, co]
-                                    co = co + 1
-                                if abs(j) == 2:
-                                    recipes[ro, co + 25] = coefficient[2, co]
-                                    co = co + 1
-                                if abs(j) == 3:
-                                    recipes[ro, co + 25] = coefficient[3, co]
-                                    co = co + 1
-                                if abs(j) == 4:
-                                    recipes[ro, co + 25] = coefficient[4, co]
-                                    co = co + 1
-                                if abs(j) == 5:
-                                    recipes[ro, co + 25] = coefficient[5, co]
-                                    co = co + 1
-                                if abs(j) == 6:
-                                    recipes[ro, co + 25] = coefficient[6, co]
-                                    co = co + 1
-                            elif j > 0 and co == 0:
-                                j = j - (j * 2)
-                                recipes[ro, co + 25] = j
-                                co = co + 1
-                            else:
-                                if abs(j) == 1:
-                                    recipes[ro, co + 25] = -1 * coefficient[1, co]
-                                    co = co + 1
-                                if abs(j) == 2:
-                                    recipes[ro, co + 25] = -1 * coefficient[2, co]
-                                    co = co + 1
-                                if abs(j) == 3:
-                                    recipes[ro, co + 25] = -1 * coefficient[3, co]
-                                    co = co + 1
-                                if abs(j) == 4:
-                                    recipes[ro, co + 25] = -1 * coefficient[4, co]
-                                    co = co + 1
-                                if abs(j) == 5:
-                                    recipes[ro, co + 25] = -1 * coefficient[5, co]
-                                    co = co + 1
-                                if abs(j) == 6:
-                                    recipes[ro, co + 25] = -1 * coefficient[6, co]
-                                    co = co + 1
-                        ro = ro + 1
-
-                    # ### 5.10 рахую суму кроків для кожного замовлення по стандартних закриланнях, колонка 29
-                    recipes[:, 29] = 2 + np.sum(recipes[:, 25:29], axis=1)
-
-                    # ### 5.11 рахую питому вартість кроку, колонка 30
-                    recipes[:, 30] = recipes[:, 5] / recipes[:, 29]
-
-                    # ### 5.12 вибираю максимальне значення питомої вартості, максимальне з колонки 30
-                    max_averag = np.amax(recipes[:, 30])
-
-                    # ### 6. порівнюю питому вартість
-                    # ### 6.1 якщо ефективне заклинання ефективніше вибираю його на відповідь
-                    if max_averag > max_average:
-                        answer_id = learns[ind_max_efficient, 0]
-                        answer = LEARN + str(int(answer_id))
-
-                    # ### 6.2 якщо звичані заклинання ефективніші - йду звичайним шляхом
-                    else:
-                        ind_max_step = recipes[recipes[:, 16] == max_average]
-                        ind_max_average = ind_max_step[0, 17]
-                        ind_max_average = int(ind_max_average)
-
-                        # n. процес виконання замовлення
-
-                        # n.2 перевірка стандартного заклинання на доступність (виконати заклинання чи відпочити)
-                        def check_n(n):
-                            if spells[n, 5] == 0:
-                                answer = REST
-                                return answer
-                            else:
-                                answer_id = int(spells[n, 0])
-                                answer = CAST + str(answer_id)
-                                return answer
-
-                        # n.1 виконання замовлення, ітерую по колонках 6-10 і вибираю стандартні заклинання
-                        k = 0
-                        for i in recipes[ind_max_average, 6:10]:
-                            if i >= 0:
-                                k = k + 1
-                            if i < 0 and k == 0:
-                                answer = check_n(0)
-                                break
-                            if i < 0 and k == 1:
-                                if recipes[ind_max_average, 6] > 0:
-                                    answer = check_n(1)
-                                    break
-                                else:
-                                    answer = check_n(0)
-                                    break
-                            if i < 0 and k == 2:
-                                if recipes[ind_max_average, 7] > 0:
-                                    answer = check_n(2)
-                                    break
-                                if recipes[ind_max_average, 6] > 0:
-                                    answer = check_n(1)
-                                    break
-                                else:
-                                    answer = check_n(0)
-                                    break
-                            if i < 0 and k == 3:
-                                if recipes[ind_max_average, 8] > 0:
-                                    answer = check_n(3)
-                                    break
-                                elif recipes[ind_max_average, 7] > 0:
-                                    answer = check_n(2)
-                                    break
-                                elif recipes[ind_max_average, 6] > 0:
-                                    answer = check_n(1)
-                                    break
-                                else:
-                                    answer = check_n(0)
-                                    break
-
     # 2.1 шлях 2-можу зробити замовлення, вибираю id
     else:
         ind_price = np.take(recipes[:, 5], x)
@@ -433,7 +404,7 @@ def print_h():
         answer_id = ans[0, 0]
         answer = BREW + str(int(answer_id))
 
-    print(answer)
+    print(dict_id)
 
 
 
