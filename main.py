@@ -18,21 +18,21 @@ def print_h():
     learns = np.zeros(shape=(6, 14))
     coefficient = np.zeros(shape=(7, 4))
 
-    recipes[0, 0:6] = [70, -3, 0, 0, -2, 14]
-    recipes[1, 0:6] = [71, 0, 0, 0, -5, 21]
-    recipes[2, 0:6] = [72, -2, 0, -2, 0, 8]
-    recipes[3, 0:6] = [73, -2, -2, 0, -2, 15]
-    recipes[4, 0:6] = [74, 0, 0, 0, -4, 16]
+    recipes[0, 0:6] = [61, 0, 0, 0, -4, 19]
+    recipes[1, 0:6] = [63, 0, 0, -3, -2, 18]
+    recipes[2, 0:6] = [69, -2, -2, -1, 0, 13]
+    recipes[3, 0:6] = [53, 0, 0, -4, 0, 12]
+    recipes[4, 0:6] = [67, 0, -2, -1, -1, 12]
     recipes[:, 17] = [0, 1, 2, 3, 4]
 
     spells[0, :] = [78, 2, 0, 0, 0, 1]
     spells[1, :] = [79, -1, 1, 0, 0, 1]
-    spells[2, :] = [80, 0, -1, 1, 0, 1]
+    spells[2, :] = [80, 0, -1, 1, 0, 0]
     spells[3, :] = [81, 0, 0, -1, 1, 1]
-    spells[4, :] = [90, 0, 2, 0, 0, 1]
-    spells[5, :] = [91, -2, 0, -1, 2, 1]
+    spells[4, :] = [94, 3, -2, 1, 0, 1]
+    spells[5, :] = [97, 3, 0, 1, -1, 1]
 
-    ingredients[0, :] = [0, 3, 0, 0, 0]
+    ingredients[0, :] = [0, 4, 3, 1, 1]
     ingredients[1, :] = [0, 3, 0, 0, 0]
 
     coefficient[1, :] = [2, 3, 4, 5]
@@ -42,12 +42,12 @@ def print_h():
     coefficient[5, :] = [6, 13, 18, 23]
     coefficient[6, :] = [6, 15, 21, 27]
 
-    learns[0, 0:6] = [30, 0, 2, 0, 0, 0]
-    learns[1, 0:6] = [31, 1, 0, 1, 0, 1]
-    learns[2, 0:6] = [32, 0, 0, -2, 2, 2]
-    learns[3, 0:6] = [33, -2, 2, 0, 0, 3]
-    learns[4, 0:6] = [34, 1, 1, 1, -1, 4]
-    learns[5, 0:6] = [35, 3, -2, 1, 0, 5]
+    learns[0, 0:6] = [30, 0, 2, -2, 1, 0]
+    learns[1, 0:6] = [31, -1, -1, 0, 1, 1]
+    learns[2, 0:6] = [32, 3, -1, 0, 0, 2]
+    learns[3, 0:6] = [33, 2, 2, 0, -1, 3]
+    learns[4, 0:6] = [34, 0, 0, -2, 2, 4]
+    learns[5, 0:6] = [35, 1, 2, -1, 0, 5]
 
     # 1. чи можу в даний момент виконати рецепт
     # 1.1 від своїх інгредієнтів віднімаю рецепти
@@ -428,13 +428,17 @@ def print_h():
 
     # 2.1 шлях 2-можу зробити замовлення, вибираю id
     else:
-        ind_price = np.take(recipes[:, 5], x)
-        pric = ind_price.max()
-        ans = recipes[recipes[:, 5] == pric]
-        answer_id = ans[0, 0]
-        answer = BREW + str(int(answer_id))
+        if y == 1:
+            answer_id = recipes[x, 0]
+            answer = BREW + str(int(answer_id))
+        else:
+            ind_price = np.take(recipes[:, 5], x)
+            pric = ind_price.max()
+            ans = recipes[recipes[:, 5] == pric]
+            answer_id = ans[0, 0]
+            answer = BREW + str(int(answer_id))
 
-    print(dict_id)
+    print(answer)
 
 
 
