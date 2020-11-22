@@ -95,3 +95,28 @@ else:
                         array[l, 4] = 1
                         l = l + 1
                         m.clear()
+
+# в функції
+                    elif j > 0 and co == 0:
+                        j = j - (j * 2)
+                        array[ro, co + 5] = j
+                        co = co + 1
+                    else:
+                        if abs(j) == 1:
+                            array[ro, co + 5] = -1 * coefficient[1, co]
+                            co = co + 1
+                        if abs(j) == 2:
+                            array[ro, co + 5] = -1 * coefficient[2, co]
+                            co = co + 1
+                        if abs(j) == 3:
+                            array[ro, co + 5] = -1 * coefficient[3, co]
+                            co = co + 1
+                        if abs(j) == 4:
+                            array[ro, co + 5] = -1 * coefficient[4, co]
+                            co = co + 1
+                        if abs(j) == 5:
+                            array[ro, co + 5] = -1 * coefficient[5, co]
+                            co = co + 1
+                        if abs(j) == 6:
+                            array[ro, co + 5] = -1 * coefficient[6, co]
+                            co = co + 1

@@ -6,6 +6,7 @@ import numpy as np
 
 
 def print_h():
+    answer = 0
     BREW = 'BREW '
     REST = 'REST'
     CAST = 'CAST '
@@ -18,21 +19,21 @@ def print_h():
     learns = np.zeros(shape=(6, 14))
     coefficient = np.zeros(shape=(7, 4))
 
-    recipes[0, 0:6] = [61, 0, 0, 0, -4, 19]
-    recipes[1, 0:6] = [63, 0, 0, -3, -2, 18]
-    recipes[2, 0:6] = [69, -2, -2, -1, 0, 13]
-    recipes[3, 0:6] = [53, 0, 0, -4, 0, 12]
-    recipes[4, 0:6] = [67, 0, -2, -1, -1, 12]
+    recipes[0, 0:6] = [61, -2, -2, -2, 0, 16]
+    recipes[1, 0:6] = [63, 0, 0, -4, 0, 13]
+    recipes[2, 0:6] = [69, -1, -1, -1, -3, 20]
+    recipes[3, 0:6] = [53, -3, 0, -2, 0, 9]
+    recipes[4, 0:6] = [67, -1, -1, -1, -1, 12]
     recipes[:, 17] = [0, 1, 2, 3, 4]
 
     spells[0, :] = [78, 2, 0, 0, 0, 1]
     spells[1, :] = [79, -1, 1, 0, 0, 1]
-    spells[2, :] = [80, 0, -1, 1, 0, 0]
+    spells[2, :] = [80, 0, -1, 1, 0, 1]
     spells[3, :] = [81, 0, 0, -1, 1, 1]
     spells[4, :] = [94, 3, -2, 1, 0, 1]
     spells[5, :] = [97, 3, 0, 1, -1, 1]
 
-    ingredients[0, :] = [0, 4, 3, 1, 1]
+    ingredients[0, :] = [0, 0, 8, 1, 0]
     ingredients[1, :] = [0, 3, 0, 0, 0]
 
     coefficient[1, :] = [2, 3, 4, 5]
@@ -102,7 +103,7 @@ def print_h():
                     q = q + 1
             return True
 
-        # ### перевірка заклинання на можливість виконати (є достатньо місця для інгредієнтів)
+        # ### перевірка заклинання на можливість виконати (є достатньо місця для інгредієнтів True)
         def check_owerflow(index, ingredients):
             ingr_main = np.sum(ingredients[0, 1:5])
             ingr_two = np.sum(index)
@@ -169,29 +170,10 @@ def print_h():
                         if abs(j) == 6:
                             array[ro, co + 5] = coefficient[6, co]
                             co = co + 1
-                    elif j > 0 and co == 0:
+                    elif j > 0:
                         j = j - (j * 2)
                         array[ro, co + 5] = j
                         co = co + 1
-                    else:
-                        if abs(j) == 1:
-                            array[ro, co + 5] = -1 * coefficient[1, co]
-                            co = co + 1
-                        if abs(j) == 2:
-                            array[ro, co + 5] = -1 * coefficient[2, co]
-                            co = co + 1
-                        if abs(j) == 3:
-                            array[ro, co + 5] = -1 * coefficient[3, co]
-                            co = co + 1
-                        if abs(j) == 4:
-                            array[ro, co + 5] = -1 * coefficient[4, co]
-                            co = co + 1
-                        if abs(j) == 5:
-                            array[ro, co + 5] = -1 * coefficient[5, co]
-                            co = co + 1
-                        if abs(j) == 6:
-                            array[ro, co + 5] = -1 * coefficient[6, co]
-                            co = co + 1
                 ro = ro + 1
 
             # ### 5.11 рахую суму кроків для кожного замовлення по стандартних закриланнях, колонка 29
@@ -326,7 +308,7 @@ def print_h():
                 q = chek_can_do(learns[r, 1:5], ingredients)
                 z = check_owerflow(learns[r, 1:5], ingredients)
                 if q == True and z == True and ingredients[0, 1] >= learns[r, 5]:
-                    dict_id[LEARN + str(int(learns[r, 0]))] = best_unit_price(learns[r, 1:5], 2, recipes, ingredients, coefficient)
+                    dict_id[LEARN + str(int(learns[r, 0]))] = best_unit_price(learns[r, 1:5], 1, recipes, ingredients, coefficient)
             r = r + 1
 
         # ### перевірка чи заклинання стандартне (False), чи додаткове (True)
@@ -359,7 +341,7 @@ def print_h():
                 q = chek_can_do(i, ingredients)
                 z = check_owerflow(i, ingredients)
                 if q == True and z == True and spells[r, 5] == 1:
-                    dict_id[CAST + str(int(spells[r, 0]))] = best_unit_price(i, 1, recipes, ingredients, coefficient)
+                    dict_id[CAST + str(int(spells[r, 0]))] = best_unit_price(i, 0, recipes, ingredients, coefficient)
             r = r + 1
 
         # ### вибрати максимальне значення зі словника
@@ -392,39 +374,83 @@ def print_h():
             for i in recipes[ind_max_average, 6:10]:
                 if i >= 0:
                     k = k + 1
-                if i < 0 and k == 0:
-                    answer = check_n(0)
-                    break
-                if i < 0 and k == 1:
-                    if recipes[ind_max_average, 6] > 0:
-                        answer = check_n(1)
-                        break
-                    else:
+                elif i < 0 and k == 0:
+                    owerflow = check_owerflow(spells[0, 1:5], ingredients)
+                    if owerflow == True:
                         answer = check_n(0)
                         break
-                if i < 0 and k == 2:
+                    else:
+                        k = k + 1
+                elif i < 0 and k == 1:
+                    if recipes[ind_max_average, 6] > 0:
+                        owerflow = check_owerflow(spells[1, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(1)
+                            break
+                        else:
+                            k = k + 1
+                    else:
+                        owerflow = check_owerflow(spells[0, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(0)
+                            break
+                        else:
+                            k = k + 1
+                elif i < 0 and k == 2:
                     if recipes[ind_max_average, 7] > 0:
-                        answer = check_n(2)
-                        break
+                        owerflow = check_owerflow(spells[2, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(2)
+                            break
+                        else:
+                            k = k + 1
                     if recipes[ind_max_average, 6] > 0:
-                        answer = check_n(1)
-                        break
+                        owerflow = check_owerflow(spells[1, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(1)
+                            break
+                        else:
+                            k = k + 1
                     else:
-                        answer = check_n(0)
-                        break
-                if i < 0 and k == 3:
+                        owerflow = check_owerflow(spells[0, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(0)
+                            break
+                        else:
+                            k = k + 1
+                elif i < 0 and k == 3:
                     if recipes[ind_max_average, 8] > 0:
-                        answer = check_n(3)
-                        break
+                        owerflow = check_owerflow(spells[3, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(3)
+                            break
+                        else:
+                            k = k + 1
                     elif recipes[ind_max_average, 7] > 0:
-                        answer = check_n(2)
-                        break
+                        owerflow = check_owerflow(spells[2, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(2)
+                            break
+                        else:
+                            k = k + 1
                     elif recipes[ind_max_average, 6] > 0:
-                        answer = check_n(1)
-                        break
+                        owerflow = check_owerflow(spells[1, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(1)
+                            break
+                        else:
+                            k = k + 1
                     else:
-                        answer = check_n(0)
-                        break
+                        owerflow = check_owerflow(spells[0, 1:5], ingredients)
+                        if owerflow == True:
+                            answer = check_n(0)
+                            break
+                        else:
+                            k = k + 1
+
+            # неможу виконати жодне з доступних заклинань через переповнення інгредієнтів
+            if answer == 0:
+                answer = REST
 
     # 2.1 шлях 2-можу зробити замовлення, вибираю id
     else:
@@ -437,6 +463,7 @@ def print_h():
             ans = recipes[recipes[:, 5] == pric]
             answer_id = ans[0, 0]
             answer = BREW + str(int(answer_id))
+
 
     print(answer)
 
