@@ -5,8 +5,6 @@
 import numpy as np
 
 
-answer = 0
-
 def print_h():
     BREW = 'BREW '
     REST = 'REST'
@@ -31,10 +29,10 @@ def print_h():
     spells[1, :] = [79, -1, 1, 0, 0, 1]
     spells[2, :] = [80, 0, -1, 1, 0, 1]
     spells[3, :] = [81, 0, 0, -1, 1, 1]
-    spells[4, :] = [90, 0, 2, 0, 0, 0]
+    spells[4, :] = [90, 0, 2, 0, 0, 1]
     spells[5, :] = [91, -2, 0, -1, 2, 1]
 
-    ingredients[0, :] = [0, 3, 1, 0, 0]
+    ingredients[0, :] = [0, 3, 0, 0, 0]
     ingredients[1, :] = [0, 3, 0, 0, 0]
 
     coefficient[1, :] = [2, 3, 4, 5]
@@ -59,7 +57,7 @@ def print_h():
         n = n + 1
 
     # 1.2 перевіряю чи можу виконати кожеш рецепт колонка 10 = 1-можу або 0-неможу
-    l: int = 0
+    l = 0
     while l < 5:
         m = []
         for i in recipes[:, 6:10]:
@@ -249,6 +247,16 @@ def print_h():
 
         # 3.2 рахую суму кроків для кожного замовлення по стандартних закриланнях, колонка 15
         recipes[:, 15] = np.sum(recipes[:, 11:15], axis=1)
+
+        # ### виправити від'ємні значення
+        r = 0
+        for i in recipes[:, 15]:
+            if i > 0:
+                recipes[r, 15] = i
+                r = r + 1
+            else:
+                recipes[r, 15] = 1
+                r = r + 1
 
         # 3.3 рахую питому вартість кроку, колонка 16
         recipes[:, 16] = recipes[:, 5] / recipes[:, 15]
