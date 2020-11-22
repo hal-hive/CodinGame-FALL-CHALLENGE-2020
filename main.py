@@ -329,11 +329,33 @@ def print_h():
                     dict_id[LEARN + str(int(learns[r, 0]))] = best_unit_price(learns[r, 1:5], 2, recipes, ingredients, coefficient)
             r = r + 1
 
+        # ### перевірка чи заклинання стандартне (False), чи додаткове (True)
+        def main_spell(i):
+            a = [2, 0, 0, 0]
+            b = [-1, 1, 0, 0]
+            c = [0, -1, 1, 0]
+            d = [0, 0, -1, 1]
+            al = np.array_equal(a, i)
+            bl = np.array_equal(b, i)
+            cl = np.array_equal(c, i)
+            dl = np.array_equal(d, i)
+            if al == True:
+                return False
+            elif bl == True:
+                return False
+            elif cl == True:
+                return False
+            elif dl == True:
+                return False
+            else:
+                return True
+
         # ### 4.2 записую в словник результати всіх своїх додаткових заклинань
         r = 0
-        for i in spells[4:, 1:5]:
+        for i in spells[:, 1:5]:
             idi = spells[r, 0]
-            if idi != 0:
+            m = main_spell(i)
+            if idi != 0 and m == True:
                 q = chek_can_do(i, ingredients)
                 z = check_owerflow(i, ingredients)
                 if q == True and z == True and spells[r, 5] == 1:
