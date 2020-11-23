@@ -3,9 +3,12 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import numpy as np
+import time
+import sys
 
 
 def print_h():
+    tic = time.perf_counter()
     answer = 0
     BREW = 'BREW '
     REST = 'REST'
@@ -19,11 +22,11 @@ def print_h():
     learns = np.zeros(shape=(6, 14))
     coefficient = np.zeros(shape=(7, 4))
 
-    recipes[0, 0:6] = [61, -2, -2, -2, 0, 16]
-    recipes[1, 0:6] = [63, 0, 0, -4, 0, 13]
-    recipes[2, 0:6] = [69, -1, -1, -1, -3, 20]
-    recipes[3, 0:6] = [53, -3, 0, -2, 0, 9]
-    recipes[4, 0:6] = [67, -1, -1, -1, -1, 12]
+    recipes[0, 0:6] = [64, 0, 0, -2, -3, 19]
+    recipes[1, 0:6] = [59, -2, 0, 0, -3, 14]
+    recipes[2, 0:6] = [67, 0, -2, -1, -1, 12]
+    recipes[3, 0:6] = [61, 0, 0, 0, -4, 16]
+    recipes[4, 0:6] = [75, -1, -3, -1, -1, 16]
     recipes[:, 17] = [0, 1, 2, 3, 4]
 
     spells[0, :] = [78, 2, 0, 0, 0, 1]
@@ -33,7 +36,7 @@ def print_h():
     spells[4, :] = [94, 3, -2, 1, 0, 1]
     spells[5, :] = [97, 3, 0, 1, -1, 1]
 
-    ingredients[0, :] = [0, 0, 8, 1, 0]
+    ingredients[0, :] = [0, 4, 3, 1, 1]
     ingredients[1, :] = [0, 3, 0, 0, 0]
 
     coefficient[1, :] = [2, 3, 4, 5]
@@ -461,11 +464,18 @@ def print_h():
             ind_price = np.take(recipes[:, 5], x)
             pric = ind_price.max()
             ans = recipes[recipes[:, 5] == pric]
-            answer_id = ans[0, 0]
-            answer = BREW + str(int(answer_id))
-
+            l = 0
+            for i in ans[:]:
+                m = i[10]
+                if m == 1:
+                    answer_id = ans[l, 0]
+                    answer = BREW + str(int(answer_id))
+                else:
+                    l = l + 1
 
     print(answer)
+    toc = time.perf_counter()
+    print(f"Debag {toc - tic:0.4f} seconds", file=sys.stderr, flush=True)
 
 
 
